@@ -1,37 +1,3 @@
-
-var BootScene = new Phaser.Class({
-    Extends: Phaser.Scene,
-    
-    initialize: function BootScene ()
-    {
-        Phaser.Scene.call(this, { key: 'BootScene' });
-    },
-
-    preload: function ()
-    {
-        // map tiles
-        // this.load.image('tiles', 'assets/map/spritesheet.png');
-        this.load.image('tiles', 'assets/map/KennyRogue/roguelike-modern-city-pack/Spritesheet/roguelikeCity_magenta.png');
-        
-        // map in json format
-        //this.load.tilemapTiledJSON('map', 'assets/map/map.json');
-        this.load.tilemapTiledJSON('map', 'assets/map/level1.json');
-        
-        // our two characters
-        this.load.spritesheet('player', 'assets/RPG_assets.png', { frameWidth: 16, frameHeight: 16 });
-        this.load.spritesheet('boy', 'assets/main_spritesheet.png', { frameWidth: 32, frameHeight: 36, spacing: 16 });
-        
-        // load police officer
-        this.load.spritesheet('officer', 'assets/officer.png', { frameWidth: 32, frameHeight: 48});
-    },
-
-    create: function ()
-    {
-        // start the WorldScene
-        this.scene.start('WorldScene');
-    }
-});
-
 var WorldScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
@@ -55,7 +21,7 @@ var WorldScene = new Phaser.Class({
         // creating the layers
         //var grass = map.createStaticLayer('Grass', tiles, 0, 0);
         //var obstacles = map.createStaticLayer('Obstacles', tiles, 0, 0);
-        var grass = map.createStaticLayer('Ground', tiles, 0, 0);
+        var ground = map.createStaticLayer('Ground', tiles, 0, 0);
         var obstacles = map.createStaticLayer('Objects', tiles, 0, 0);
         
         // make all tiles in obstacles collidable
@@ -207,7 +173,7 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 0 },
-            debug: false // set to true to view zones
+            debug: true // set to true to view zones
         }
     },
     scene: [
