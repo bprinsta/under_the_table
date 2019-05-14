@@ -187,7 +187,6 @@ var WorldScene = new Phaser.Class({
     }
 });
 
-
 var config = {
     type: Phaser.AUTO,
     parent: 'content',
@@ -203,8 +202,11 @@ var config = {
         }
     },
     scene: [
+        TitleScene,
         BootScene,
         WorldScene
     ]
 };
 var game = new Phaser.Game(config);
+//game.scene.add('TitleScene', titleScene);
+//game.scene.start('TitleScene');
