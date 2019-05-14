@@ -22,6 +22,8 @@ var BootScene = new Phaser.Class({
         
         // load police officer
         this.load.spritesheet('officer', 'assets/officer.png', { frameWidth: 32, frameHeight: 48});
+
+        this.load.audio('music', 'assets/Battle Theme II v1.2.wav');
     },
 
     create: function ()

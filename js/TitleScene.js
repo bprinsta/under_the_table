@@ -22,6 +22,6 @@ class TitleScene extends Phaser.Scene
         background.setScale(0.23, 0.258);
 
         // Find way to delay the game from starting
-        //this.scene.start('BootScene');
+        this.scene.start('BootScene');
     }
 }

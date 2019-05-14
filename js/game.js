@@ -39,13 +39,42 @@ var WorldScene = new Phaser.Class({
         });
     },
 
-    police: function(x, y)
+    policeAnimations: function()
     {
-        var police = this.physics.add.sprite(300, 75, 'officer', 6);
+        this.anims.create({
+            key: 'o_left',
+            frames: this.anims.generateFrameNumbers('officer', { frames: [4, 5, 6, 7]}),
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'o_right',
+            frames: this.anims.generateFrameNumbers('officer', { frames: [8, 9, 10, 11]}),
+            frameRate: 10,
+            repeat: -1
+        });  
+        this.anims.create({
+            key: 'o_up',
+            frames: this.anims.generateFrameNumbers('officer', { frames: [12, 13, 14, 15]}),
+            frameRate: 10,
+            repeat: -1
+        });  
+        this.anims.create({
+            key: 'o_down',
+            frames: this.anims.generateFrameNumbers('officer', { frames: [0, 1, 2, 3]}),
+            frameRate: 10,
+            repeat: -1
+        });  
+
+
     },
 
     create: function ()
     {
+        this.sound.add('music');
+        this.sound.play('music');
+        this.sound.once('complete', this.gameOver);
+        
         // create the map
         var map = this.add.tilemap('map');
 
@@ -67,7 +96,9 @@ var WorldScene = new Phaser.Class({
 
         // set player animation frames
         this.playerAnimations();
-                
+        this.playerSpeed = 96;
+
+
         // our player sprite created through the phycis system
         this.player = this.physics.add.sprite(18, 60, 'player', 6);
 
@@ -106,10 +137,13 @@ var WorldScene = new Phaser.Class({
                 stepY: 0
             }
         })
+        this.policeAnimations();
+
         Phaser.Actions.ScaleXY(this.enemies.getChildren(), -0.5, -0.5);
         
         // where the enemies will be
         this.spawns = this.physics.add.group({ classType: Phaser.GameObjects.Zone });
+        // var zone = 
         /* for(var i = 0; i < 6; i++) {
             // var x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
             // var y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
@@ -119,8 +153,9 @@ var WorldScene = new Phaser.Class({
             
         } */
         this.enemies.getChildren().forEach(element => {
-            this.spawns.create(element.x, element.y + 48, 16, 80); 
+            this.spawns.create(element.x, element.y + 40, 16, 80); 
         });
+        // this.enemies.getChildren().anims.play('left');
 
         var tween = this.tweens.add({
             targets: this.enemies.getChildren(),
@@ -129,6 +164,18 @@ var WorldScene = new Phaser.Class({
             duration: 1000,
             repeat: -1,
             yoyo: true
+        });
+        var tween2 = this.tweens.add({
+            targets: this.spawns.getChildren(),
+            y: '+=100',
+            ease: 'Linear',
+            duration: 1000,
+            //delay: 500,
+            repeat: -1,
+            yoyo: true
+        });
+        this.enemies.getChildren().forEach(element => {
+            element.anims.play('o_down', true);
         });
 
         // add collider
@@ -152,21 +199,21 @@ var WorldScene = new Phaser.Class({
         // Horizontal movement
         if (this.cursors.left.isDown)
         {
-            this.player.body.setVelocityX(-80);
+            this.player.body.setVelocityX(- this.playerSpeed);
         }
         else if (this.cursors.right.isDown)
         {
-            this.player.body.setVelocityX(80);
+            this.player.body.setVelocityX( this.playerSpeed);
         }
 
         // Vertical movement
         if (this.cursors.up.isDown)
         {
-            this.player.body.setVelocityY(-80);
+            this.player.body.setVelocityY(-this.playerSpeed);
         }
         else if (this.cursors.down.isDown)
         {
-            this.player.body.setVelocityY(80);
+            this.player.body.setVelocityY( this.playerSpeed);
         }        
 
         // Update the animation last and give left/right animations precedence over up/down animations
@@ -195,15 +242,52 @@ var WorldScene = new Phaser.Class({
 
         // console.log(this.player.body.x)
     },
+    updatePoliceAnimations: function ()
+    {
+        if (this.cursors.left.isDown)
+        {
+            this.enemies.getChildren().forEach(element => {
+                element.anims.play('o_left', true);
+                element.flipX = true;
+            });
+
+        }
+        else if (this.cursors.right.isDown)
+        {
+            this.enemies.getChildren().forEach(element => {
+                element.anims.play('o_right', true);
+                element.flipX = true;
+            });
+        }
+        else if (this.cursors.up.isDown)
+        {
+            this.enemies.getChildren().forEach(element => {
+                element.anims.play('o_up', true);
+            });
+        }
+        else if (this.cursors.down.isDown)
+        {
+            this.enemies.getChildren().forEach(element => {
+                element.anims.play('o_down', true);
+            });
+        }
+        else
+        {
+            this.enemies.getChildren().forEach(element => {
+                element.anims.stop();
+            });
+        }
+    },
     update: function (time, delta)
     {
     //    this.controls.update(delta);
         this.updatePlayerAnimations();
+        this.updatePoliceAnimations();
     },
     gameOver: function()
     {
-        this.playerAlive = false;
-        
+        // this.sound.stop();
+
         // shake the world
         this.cameras.main.shake(300);
         
@@ -226,6 +310,9 @@ var config = {
     height: 240,
     zoom: 2,
     pixelArt: true,
+    audio: {
+        disableWebAudio: false
+    },
     physics: {
         default: 'arcade',
         arcade: {
@@ -240,5 +327,6 @@ var config = {
     ]
 };
 var game = new Phaser.Game(config);
+
 //game.scene.add('TitleScene', titleScene);
 //game.scene.start('TitleScene');
