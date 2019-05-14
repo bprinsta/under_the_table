@@ -9,24 +9,8 @@ var WorldScene = new Phaser.Class({
 
     preload: function (){},
 
-    create: function ()
+    playerAnimations: function()
     {
-        // create the map
-        var map = this.add.tilemap('map');
-
-        // first parameter is the name of the tilemap in tiled
-        // var tiles = map.addTilesetImage('spritesheet', 'tiles');
-        var tiles = map.addTilesetImage('modern', 'tiles');
-        
-        // creating the layers
-        //var grass = map.createStaticLayer('Grass', tiles, 0, 0);
-        //var obstacles = map.createStaticLayer('Obstacles', tiles, 0, 0);
-        var ground = map.createStaticLayer('Ground', tiles, 0, 0);
-        var obstacles = map.createStaticLayer('Objects', tiles, 0, 0);
-        
-        // make all tiles in obstacles collidable
-        obstacles.setCollisionByExclusion([-1]);
-        
         //  animation with key 'left', we don't need left and right as we will use one and flip the sprite
         this.anims.create({
             key: 'left',
@@ -52,8 +36,30 @@ var WorldScene = new Phaser.Class({
             frames: this.anims.generateFrameNumbers('player', { frames: [ 0, 6, 0, 12 ] }),
             frameRate: 10,
             repeat: -1
-        });        
+        });
+    },
 
+    create: function ()
+    {
+        // create the map
+        var map = this.add.tilemap('map');
+
+        // first parameter is the name of the tilemap in tiled
+        // var tiles = map.addTilesetImage('spritesheet', 'tiles');
+        var tiles = map.addTilesetImage('modern', 'tiles');
+        
+        // creating the layers
+        //var grass = map.createStaticLayer('Grass', tiles, 0, 0);
+        //var obstacles = map.createStaticLayer('Obstacles', tiles, 0, 0);
+        var ground = map.createStaticLayer('Ground', tiles, 0, 0);
+        var obstacles = map.createStaticLayer('Objects', tiles, 0, 0);
+        
+        // make all tiles in obstacles collidable
+        obstacles.setCollisionByExclusion([-1]);
+        
+        // set player animation frames
+        this.playerAnimations();
+                
         // our player sprite created through the phycis system
         this.player = this.physics.add.sprite(50, 75, 'player', 6);
         
@@ -71,8 +77,14 @@ var WorldScene = new Phaser.Class({
         this.cameras.main.roundPixels = true; // avoid tile bleed
     
         // user input
-        this.cursors = this.input.keyboard.createCursorKeys();
-        
+        //this.cursors = this.input.keyboard.createCursorKeys();
+        this.cursors = this.input.keyboard.addKeys({
+            up:Phaser.Input.Keyboard.KeyCodes.W,
+            down:Phaser.Input.Keyboard.KeyCodes.S,
+            left:Phaser.Input.Keyboard.KeyCodes.A,
+            right:Phaser.Input.Keyboard.KeyCodes.D
+        });
+
         // police
         this.enemies = this.physics.add.group({
             key: 'officer', 
@@ -109,7 +121,7 @@ var WorldScene = new Phaser.Class({
         
         // start battle 
     },
-    playerAnimations: function ()
+    updatePlayerAnimations: function ()
     {
         this.player.body.setVelocity(0);
 
@@ -160,7 +172,7 @@ var WorldScene = new Phaser.Class({
     update: function (time, delta)
     {
     //    this.controls.update(delta);
-        this.playerAnimations();
+        this.updatePlayerAnimations();
     }
 });
 
