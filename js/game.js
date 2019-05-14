@@ -109,10 +109,8 @@ var WorldScene = new Phaser.Class({
         
         // start battle 
     },
-    update: function (time, delta)
+    playerAnimations: function ()
     {
-    //    this.controls.update(delta);
-    
         this.player.body.setVelocity(0);
 
         // Horizontal movement
@@ -158,9 +156,14 @@ var WorldScene = new Phaser.Class({
         {
             this.player.anims.stop();
         }
+    },
+    update: function (time, delta)
+    {
+    //    this.controls.update(delta);
+        this.playerAnimations();
     }
-    
 });
+
 
 var config = {
     type: Phaser.AUTO,
