@@ -62,8 +62,7 @@ var WorldScene = new Phaser.Class({
         
         // make all tiles in obstacles collidable
         obstacles.setCollisionByExclusion([-1]);
-        
-        // set
+        // set above layer depth
         aboveLayer.setDepth(10);
 
         // set player animation frames
@@ -71,7 +70,8 @@ var WorldScene = new Phaser.Class({
                 
         // our player sprite created through the phycis system
         this.player = this.physics.add.sprite(18, 60, 'player', 6);
-        
+
+
         // don't go out of the map
         this.physics.world.bounds.width = map.widthInPixels;
         this.physics.world.bounds.height = map.heightInPixels;
@@ -79,6 +79,7 @@ var WorldScene = new Phaser.Class({
         
         // don't walk on objects
         this.physics.add.collider(this.player, obstacles);
+      
 
         // limit camera to map
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -97,38 +98,52 @@ var WorldScene = new Phaser.Class({
         // police
         this.enemies = this.physics.add.group({
             key: 'officer', 
-            repeat: 30,
+            repeat: 4,
             setXY: {
-                x:110,
-                y: 100,
-                stepX: 80,
-                stepY: 20
+                x:180,
+                y: 48,
+                stepX: 96,
+                stepY: 0
             }
         })
-
         Phaser.Actions.ScaleXY(this.enemies.getChildren(), -0.5, -0.5);
         
         // where the enemies will be
-        /* this.spawns = this.physics.add.group({ classType: Phaser.GameObjects.Zone });
-        for(var i = 0; i < 30; i++) {
-            var x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
-            var y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
-            // parameters are x, y, width, height
-            this.enemies.create(x, y, 20, 20);            
-        }  */
+        this.spawns = this.physics.add.group({ classType: Phaser.GameObjects.Zone });
+        /* for(var i = 0; i < 6; i++) {
+            // var x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
+            // var y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
+            
+            // parameters are x, y, width, heights
+            // this.spawns.create(x, y, 16, 16);
+            
+        } */
+        this.enemies.getChildren().forEach(element => {
+            this.spawns.create(element.x, element.y + 48, 16, 80); 
+        });
+
+        var tween = this.tweens.add({
+            targets: this.enemies.getChildren(),
+            y: '+=100',
+            ease: 'Linear',
+            duration: 1000,
+            repeat: -1,
+            yoyo: true
+        });
 
         // add collider
-        this.physics.add.overlap(this.player, this.enemies, this.onMeetEnemy, false, this);
+        this.physics.add.overlap(this.player, this.enemies, this.gameOver, false, this);
+        this.physics.add.overlap(this.player, this.spawns, this.gameOver, false, this);
     },
     onMeetEnemy: function(player, zone) {        
         // we move the zone to some other location
         zone.x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
         zone.y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
-        
+        this.spawns.create(x, y + 16, 16, 16); 
+
         // shake the world
         this.cameras.main.shake(300);
         
-        // start battle 
     },
     updatePlayerAnimations: function ()
     {
@@ -184,9 +199,25 @@ var WorldScene = new Phaser.Class({
     {
     //    this.controls.update(delta);
         this.updatePlayerAnimations();
+    },
+    gameOver: function()
+    {
+        this.playerAlive = false;
+        
+        // shake the world
+        this.cameras.main.shake(300);
+        
+        // fade camera
+        this.time.delayedCall(250, function() {
+            this.cameras.main.fade(250);
+        }, [], this);
+
+        // restart game
+        this.time.delayedCall(500, function() {
+            this.scene.restart();
+        }, [], this);
     }
 });
-
 
 var config = {
     type: Phaser.AUTO,
