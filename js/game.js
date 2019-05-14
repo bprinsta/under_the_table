@@ -39,6 +39,11 @@ var WorldScene = new Phaser.Class({
         });
     },
 
+    police: function(x, y)
+    {
+        var police = this.physics.add.sprite(300, 75, 'officer', 6);
+    },
+
     create: function ()
     {
         // create the map
@@ -51,17 +56,21 @@ var WorldScene = new Phaser.Class({
         // creating the layers
         //var grass = map.createStaticLayer('Grass', tiles, 0, 0);
         //var obstacles = map.createStaticLayer('Obstacles', tiles, 0, 0);
-        var ground = map.createStaticLayer('Ground', tiles, 0, 0);
-        var obstacles = map.createStaticLayer('Objects', tiles, 0, 0);
+        var ground = map.createStaticLayer('Below Player', tiles, 0, 0);
+        var obstacles = map.createStaticLayer('World Level', tiles, 0, 0);
+        var aboveLayer = map.createStaticLayer('Above Player', tiles, 0, 0);
         
         // make all tiles in obstacles collidable
         obstacles.setCollisionByExclusion([-1]);
         
+        // set
+        aboveLayer.setDepth(10);
+
         // set player animation frames
         this.playerAnimations();
                 
         // our player sprite created through the phycis system
-        this.player = this.physics.add.sprite(50, 75, 'player', 6);
+        this.player = this.physics.add.sprite(18, 60, 'player', 6);
         
         // don't go out of the map
         this.physics.world.bounds.width = map.widthInPixels;
@@ -168,6 +177,8 @@ var WorldScene = new Phaser.Class({
         {
             this.player.anims.stop();
         }
+
+        // console.log(this.player.body.x)
     },
     update: function (time, delta)
     {
