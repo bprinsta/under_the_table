@@ -1,0 +1,12 @@
+{ "columns":37,
+ "image":"KennyRogue\/roguelike-modern-city-pack\/Spritesheet\/roguelikeCity_magenta.png",
+ "imageheight":475,
+ "imagewidth":628,
+ "margin":0,
+ "name":"modern",
+ "spacing":1,
+ "tilecount":1036,
+ "tileheight":16,
+ "tilewidth":16,
+ "type":"tileset"
+}
