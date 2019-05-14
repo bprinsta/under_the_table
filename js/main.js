@@ -1,3 +1,6 @@
+import TitleScene from './TitleScene';
+
+let titleScene = new TitleScene();
 var config = {
     type: Phaser.AUTO,
     parent: 'content',
@@ -11,10 +14,13 @@ var config = {
             gravity: { y: 0 },
             debug: false // set to true to view zones
         }
-    },
-    scene: [
+    }
+    //scene:
+    /*[
         BootScene,
         WorldScene
-    ]
+    ]*/
 };
 var game = new Phaser.Game(config);
+game.scene.add('TitleScene', titleScene);
+game.scene.start('TitleScene');
