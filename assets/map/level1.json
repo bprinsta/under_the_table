@@ -19,8 +19,41 @@
          "name":"World Level",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":40,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "name":"Spawns",
+         "objects":[
+                {
+                 "ellipse":true,
+                 "height":10.366991499067,
+                 "id":6,
+                 "name":"Player Spawn",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":10.0214251157647,
+                 "x":15.2049208652982,
+                 "y":56.6728868615661
+                }, 
+                {
+                 "height":16,
+                 "id":9,
+                 "name":"Enemie Spawn",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":176,
+                 "y":48
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
          "x":0,
          "y":0
         }, 
@@ -31,12 +64,12 @@
          "name":"Above Player",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":40,
          "x":0,
          "y":0
         }],
- "nextobjectid":1,
+ "nextobjectid":10,
  "orientation":"orthogonal",
  "renderorder":"left-down",
  "tiledversion":"1.0.2",
