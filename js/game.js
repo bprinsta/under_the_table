@@ -1,3 +1,5 @@
+var PIXEL_SIZE = 16;
+
 var WorldScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
@@ -39,9 +41,34 @@ var WorldScene = new Phaser.Class({
         });
     },
 
-    police: function(x, y)
+    policeAnimations: function()
     {
-        var police = this.physics.add.sprite(300, 75, 'officer', 6);
+        this.anims.create({
+            key: 'o_left',
+            frames: this.anims.generateFrameNumbers('officer', { frames: [4, 5, 6, 7]}),
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'o_right',
+            frames: this.anims.generateFrameNumbers('officer', { frames: [8, 9, 10, 11]}),
+            frameRate: 10,
+            repeat: -1
+        });  
+        this.anims.create({
+            key: 'o_up',
+            frames: this.anims.generateFrameNumbers('officer', { frames: [12, 13, 14, 15]}),
+            frameRate: 10,
+            repeat: -1
+        });  
+        this.anims.create({
+            key: 'o_down',
+            frames: this.anims.generateFrameNumbers('officer', { frames: [0, 1, 2, 3]}),
+            frameRate: 10,
+            repeat: -1
+        });  
+
+
     },
 
     create: function ()
@@ -67,9 +94,17 @@ var WorldScene = new Phaser.Class({
 
         // set player animation frames
         this.playerAnimations();
-                
+        this.playerSpeed = 96;
+
+        const spawnPoint = map.findObject("Objects", obj => obj.name === "Player Spawn");
+        const endPoint = map.findObject("Objects", obj => obj.name === "Portal");
+
         // our player sprite created through the phycis system
-        this.player = this.physics.add.sprite(18, 60, 'player', 6);
+        this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, 'player', 1);
+
+        this.portal = this.physics.add.sprite(endPoint.x, endPoint.y, 'portal');
+
+        //Phaser.Actions.ScaleXY(this.portal, 0.5, 0.5);
 
 
         // don't go out of the map
@@ -98,52 +133,56 @@ var WorldScene = new Phaser.Class({
         // police
         this.enemies = this.physics.add.group({
             key: 'officer', 
-            repeat: 4,
+            repeat: 5,
             setXY: {
-                x:180,
-                y: 48,
-                stepX: 96,
-                stepY: 0
+                x: 5 * PIXEL_SIZE,
+                y: 6 * PIXEL_SIZE,
+                stepX: 4 * PIXEL_SIZE,
+                stepY: 3 * PIXEL_SIZE
             }
         })
+        var police_points = []
+        this.policeAnimations();
+
         Phaser.Actions.ScaleXY(this.enemies.getChildren(), -0.5, -0.5);
         
         // where the enemies will be
         this.spawns = this.physics.add.group({ classType: Phaser.GameObjects.Zone });
-        /* for(var i = 0; i < 6; i++) {
-            // var x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
-            // var y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
-            
-            // parameters are x, y, width, heights
-            // this.spawns.create(x, y, 16, 16);
-            
-        } */
+       
         this.enemies.getChildren().forEach(element => {
-            this.spawns.create(element.x, element.y + 48, 16, 80); 
+            this.spawns.create(element.x - 32, element.y, 48, 16); 
         });
 
         var tween = this.tweens.add({
             targets: this.enemies.getChildren(),
-            y: '+=100',
+            // y: '+=100',
+            x: '+= 80',
             ease: 'Linear',
             duration: 1000,
             repeat: -1,
             yoyo: true
         });
+        var tween2 = this.tweens.add({
+            targets: this.spawns.getChildren(),
+            // y: '+=100',
+            x: '+= 80',
+            ease: 'Linear',
+            duration: 1000,
+            //delay: 500,
+            repeat: -1,
+            yoyo: true
+        });
+
+        this.enemies.getChildren().forEach(element => {
+            element.anims.play('o_down', true);
+        });
 
         // add collider
         this.physics.add.overlap(this.player, this.enemies, this.gameOver, false, this);
-        this.physics.add.overlap(this.player, this.spawns, this.gameOver, false, this);
-    },
-    onMeetEnemy: function(player, zone) {        
-        // we move the zone to some other location
-        zone.x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
-        zone.y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
-        this.spawns.create(x, y + 16, 16, 16); 
 
-        // shake the world
-        this.cameras.main.shake(300);
-        
+        this.physics.add.overlap(this.player, this.spawns, this.gameOver, false, this);
+
+        this.physics.add.overlap(this.player, this.portal, this.gameWin, false, this);
     },
     updatePlayerAnimations: function ()
     {
@@ -152,21 +191,21 @@ var WorldScene = new Phaser.Class({
         // Horizontal movement
         if (this.cursors.left.isDown)
         {
-            this.player.body.setVelocityX(-80);
+            this.player.body.setVelocityX(- this.playerSpeed);
         }
         else if (this.cursors.right.isDown)
         {
-            this.player.body.setVelocityX(80);
+            this.player.body.setVelocityX( this.playerSpeed);
         }
 
         // Vertical movement
         if (this.cursors.up.isDown)
         {
-            this.player.body.setVelocityY(-80);
+            this.player.body.setVelocityY(-this.playerSpeed);
         }
         else if (this.cursors.down.isDown)
         {
-            this.player.body.setVelocityY(80);
+            this.player.body.setVelocityY( this.playerSpeed);
         }        
 
         // Update the animation last and give left/right animations precedence over up/down animations
@@ -193,19 +232,68 @@ var WorldScene = new Phaser.Class({
             this.player.anims.stop();
         }
 
-        // console.log(this.player.body.x)
+    },
+    updatePoliceAnimations: function ()
+    {
+        this.enemies.getChildren().forEach(element => {
+            if (element.body.velocity.x < 0)
+            {
+                    element.anims.play('o_left', true);
+                    element.flipX = true;
+            }
+            else if (element.body.velocity.x > 0)
+            {
+                    element.anims.play('o_right', true);
+                    element.flipX = true;
+            }
+            else if (element.body.velocity.y < 0)
+            {
+                    element.anims.play('o_up', true);
+            }
+            else if (element.body.velocity.y > 0)
+            {
+                    element.anims.play('o_down', true);
+            }
+            else
+            {
+                    element.anims.stop();
+            }
+        });
     },
     update: function (time, delta)
     {
     //    this.controls.update(delta);
         this.updatePlayerAnimations();
+        this.updatePoliceAnimations();
+
+        this.enemies.getChildren().forEach(element => {
+            element.body.setVelocityX(16);
+        });
+        console.log(this.enemies.getChildren())
     },
     gameOver: function()
     {
-        this.playerAlive = false;
-        
+        // this.sound.stop();
+
         // shake the world
         this.cameras.main.shake(300);
+        
+        // fade camera
+        this.time.delayedCall(250, function() {
+            this.cameras.main.fade(250);
+        }, [], this);
+
+        // restart game
+        this.time.delayedCall(500, function() {
+            this.scene.restart();
+        }, [], this);
+    },
+    gameWin: function()
+    {
+        // this.sound.stop();
+
+        // shake the world
+        // this.cameras.main.shake(300);
         
         // fade camera
         this.time.delayedCall(250, function() {
@@ -226,6 +314,9 @@ var config = {
     height: 240,
     zoom: 2,
     pixelArt: true,
+    audio: {
+        disableWebAudio: false
+    },
     physics: {
         default: 'arcade',
         arcade: {
@@ -240,5 +331,6 @@ var config = {
     ]
 };
 var game = new Phaser.Game(config);
+
 //game.scene.add('TitleScene', titleScene);
 //game.scene.start('TitleScene');
