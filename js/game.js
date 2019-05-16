@@ -133,12 +133,12 @@ var WorldScene = new Phaser.Class({
         // police
         this.enemies = this.physics.add.group({
             key: 'officer', 
-            repeat: 5,
+            repeat: 4,
             setXY: {
                 x: 5 * PIXEL_SIZE,
                 y: 6 * PIXEL_SIZE,
                 stepX: 4 * PIXEL_SIZE,
-                stepY: 3 * PIXEL_SIZE
+                stepY: 4 * PIXEL_SIZE
             }
         })
         var police_points = []
@@ -269,11 +269,13 @@ var WorldScene = new Phaser.Class({
         this.enemies.getChildren().forEach(element => {
             element.body.setVelocityX(16);
         });
-        console.log(this.enemies.getChildren())
+       //  console.log(this.enemies.getChildren())
     },
     gameOver: function()
     {
         // this.sound.stop();
+
+       // this.sound.play('alert');
 
         // shake the world
         this.cameras.main.shake(300);
@@ -321,7 +323,7 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 0 },
-            debug: true // set to true to view zones
+            debug: false // set to true to view zones
         }
     },
     scene: [
