@@ -27,15 +27,15 @@ var BootScene = new Phaser.Class({
         // load portal
         this.load.image('portal', 'assets/portal_small.png');
 
-        this.load.audio('music', 'assets/Battle Theme II v1.2.wav');
+        // this.load.audio('music', 'assets/Battle Theme II v1.2.wav');
         // this.load.audio('alert', 'assets/pokemon.wav');
     },
 
     create: function ()
     {
-       this.sound.add('music');
+        // this.sound.add('music');
         // this.sound.add('alert');
-        this.sound.play('music');
+        // this.sound.play('music');
         // this.sound.once('complete', this.gameOver);
         this.level = 0;
 
